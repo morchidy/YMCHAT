@@ -55,6 +55,28 @@ export function AuthProvider({ children }) {
     }
   }
 
+  const register = async (name, email, password) => {
+    try {
+      const response = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, email, password })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        return { success: true, email }
+      } else {
+        return { success: false, message: data.message || 'Erreur lors de l\'enregistrement' }
+      }
+    } catch (err) {
+      return { success: false, message: 'Erreur de connexion au serveur' }
+    }
+  }
+
   const logout = () => {
     setToken('')
     localStorage.removeItem('token')
@@ -62,7 +84,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, loading }}>
+    <AuthContext.Provider value={{ token, user, login, logout, register, loading }}>
       {children}
     </AuthContext.Provider>
   )

@@ -1,0 +1,23 @@
+Données initiales créées
+Utilisateurs :
+
+Admin User :
+Email : admin@example.com
+Mot de passe : admin123
+Admin : Oui
+Normal User :
+Email : user@example.com
+Mot de passe : user123
+Admin : Non
+Groupes :
+
+Admin Group :
+Propriétaire : Admin User
+User Group :
+Propriétaire : Normal User
+Membres des groupes :
+
+Admin Group :
+Membres : Admin User, Normal User
+User Group :
+Membres : Normal User

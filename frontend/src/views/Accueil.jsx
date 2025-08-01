@@ -1,7 +1,8 @@
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/AuthContext';
+import GroupList from '../components/GroupList';
 
 function Accueil() {
-  const { user, logout } = useAuth()
+  const { user, logout } = useAuth();
 
   return (
     <div className="accueil-container">
@@ -11,11 +12,11 @@ function Accueil() {
       </header>
       
       <main>
-        <h2>Bienvenue sur votre espace</h2>
-        <p>Vous êtes connecté en tant que {user?.email}</p>
+        <h2>Mes groupes</h2>
+        <GroupList />
       </main>
     </div>
-  )
+  );
 }
 
-export default Accueil
+export default Accueil;

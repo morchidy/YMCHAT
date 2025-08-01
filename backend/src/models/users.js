@@ -24,6 +24,11 @@ const users = db.define('users', {
     validate: {
       is: /^[0-9a-z\\/$.]{60}$/i
     }
+  },
+  isAdmin: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false // Par défaut, l'utilisateur n'est pas admin
   }
+
 }, { timestamps: false })
 module.exports = users

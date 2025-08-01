@@ -14,3 +14,8 @@ test('Test if user can log in and list users', async () => {
   expect(response.body.message).toBe('Returning users')
   expect(response.body.data.length).toBeGreaterThan(0)
 })
+
+afterAll(async () => {
+  // Nettoyer les données de test si nécessaire
+  // Par exemple, supprimer les utilisateurs et groupes créés pour les tests
+});

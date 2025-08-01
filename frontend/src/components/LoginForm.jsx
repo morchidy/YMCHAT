@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 
-function LoginForm() {
-  const [email, setEmail] = useState('')
+function LoginForm({ prefillEmail = '' }) {
+  const [email, setEmail] = useState(prefillEmail)
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const { login } = useAuth()
+
+  useEffect(() => {
+    setEmail(prefillEmail)
+  }, [prefillEmail])
 
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
