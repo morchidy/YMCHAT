@@ -15,9 +15,15 @@ async function getGroupMessages(req, res) {
     const groupId = req.params.gid;
     const userId = req.login.id;
     
-    // Vérifier si l'utilisateur est membre du groupe (déjà vérifié par middleware)
+    // Utiliser include pour joindre les informations des utilisateurs qui ont posté les messages
     const groupMessages = await messages.findAll({
       where: { groupId },
+      include: [
+        {
+          model: require('../models/users.js'),  // Modèle User
+          attributes: ['id', 'name', 'email']    // Ne récupérer que ces attributs
+        }
+      ],
       order: [['createdAt', 'DESC']]
     });
     

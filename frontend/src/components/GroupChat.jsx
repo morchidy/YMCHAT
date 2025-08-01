@@ -97,7 +97,9 @@ function GroupChat({ group }) {
                 className={`message-item ${message.userId === user.id ? 'my-message' : ''}`}
               >
                 <div className="message-header">
-                  <strong>{message.user?.email || 'Utilisateur inconnu'}</strong>
+                  <strong>
+                    {message.user?.name || message.user?.email || `Utilisateur #${message.userId}`}
+                  </strong>
                   <span className="message-time">{formatDate(message.createdAt)}</span>
                 </div>
                 <div className="message-content">
