@@ -14,7 +14,7 @@ function Login() {
     <Container className="py-5">
       <Row className="justify-content-center mb-4">
         <Col md={8} className="text-center">
-          <h1 className="display-4 mb-4">Réseau Social</h1>
+          <h1 className="display-4 mb-4">YMCHAT</h1>
         </Col>
       </Row>
       
