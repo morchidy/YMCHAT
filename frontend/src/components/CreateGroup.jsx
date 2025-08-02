@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import groupService from '../services/groupService';
+import { Card, Form, Button, Alert } from 'react-bootstrap';
 
 function CreateGroup({ onGroupCreated }) {
   const [groupName, setGroupName] = useState('');
@@ -38,24 +39,31 @@ function CreateGroup({ onGroupCreated }) {
   };
 
   return (
-    <div className="create-group">
-      <h3>Créer un nouveau groupe</h3>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group create-group-form">
-          <input 
-            type="text" 
-            placeholder="Nom du nouveau groupe" 
-            value={groupName} 
-            onChange={(e) => setGroupName(e.target.value)}
-            disabled={loading}
-          />
-          <button type="submit" disabled={loading} className="create-btn">
-            {loading ? 'Création...' : 'Créer'}
-          </button>
-        </div>
-        {error && <div className="error-message">{error}</div>}
-      </form>
-    </div>
+    <Card>
+      <Card.Header as="h5">Créer un nouveau groupe</Card.Header>
+      <Card.Body>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="d-flex">
+            <Form.Control 
+              type="text" 
+              placeholder="Nom du nouveau groupe" 
+              value={groupName} 
+              onChange={(e) => setGroupName(e.target.value)}
+              disabled={loading}
+              className="me-2"
+            />
+            <Button 
+              type="submit" 
+              disabled={loading}
+              variant="success"
+            >
+              {loading ? 'Création...' : 'Créer'}
+            </Button>
+          </Form.Group>
+          {error && <Alert variant="danger" className="mt-2">{error}</Alert>}
+        </Form>
+      </Card.Body>
+    </Card>
   );
 }
 

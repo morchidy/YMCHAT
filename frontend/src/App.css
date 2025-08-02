@@ -4,6 +4,18 @@
   padding: 2rem;
 }
 
+body {
+  background-color: #f8f9fa;
+}
+
+.chat-messages-container {
+  height: 400px;
+  overflow-y: auto;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+}
+
 .form-container {
   display: flex;
   flex-direction: column;
@@ -380,4 +392,15 @@ button:hover {
 
 .send-btn:hover {
   background-color: #535bf2;
+}
+
+/* Pour les petits écrans */
+@media (max-width: 768px) {
+  .auth-container {
+    flex-direction: column;
+  }
+  
+  .chat-messages-container {
+    height: 300px;
+  }
 }

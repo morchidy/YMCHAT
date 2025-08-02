@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { Form, Button, Alert } from 'react-bootstrap'
 
 function RegisterForm({ onRegisterSuccess }) {
   const [name, setName] = useState('')
@@ -95,58 +96,66 @@ function RegisterForm({ onRegisterSuccess }) {
   }
 
   return (
-    <div className="form-container">
-      <h2>Enregistrez-vous</h2>
+    <div>
+      <h2 className="text-center mb-4">Enregistrez-vous</h2>
       
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="register-name">Nom</label>
-          <input 
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3">
+          <Form.Label>Nom</Form.Label>
+          <Form.Control 
             type="text" 
             id="register-name" 
             value={name} 
             onChange={(e) => setName(e.target.value)}
+            placeholder="Entrez votre nom"
             required
           />
-        </div>
+        </Form.Group>
         
-        <div className="form-group">
-          <label htmlFor="register-email">Email</label>
-          <input 
+        <Form.Group className="mb-3">
+          <Form.Label>Email</Form.Label>
+          <Form.Control 
             type="email" 
             id="register-email" 
             value={email} 
             onChange={handleEmailChange}
+            placeholder="Entrez votre email"
             required
           />
-        </div>
+        </Form.Group>
         
-        <div className="form-group">
-          <label htmlFor="register-password">Mot de Passe</label>
-          <input 
+        <Form.Group className="mb-3">
+          <Form.Label>Mot de Passe</Form.Label>
+          <Form.Control 
             type="password" 
             id="register-password" 
             value={password} 
             onChange={handlePasswordChange}
+            placeholder="Mot de passe (au moins 6 caractères)"
             required
           />
-        </div>
+        </Form.Group>
         
-        <div className="form-group">
-          <label htmlFor="register-confirm-password">Confirmez votre Mot de Passe</label>
-          <input 
+        <Form.Group className="mb-3">
+          <Form.Label>Confirmez votre Mot de Passe</Form.Label>
+          <Form.Control 
             type="password" 
             id="register-confirm-password" 
             value={confirmPassword} 
             onChange={handleConfirmPasswordChange}
+            placeholder="Confirmez votre mot de passe"
             required
           />
+        </Form.Group>
+        
+        {error && <Alert variant="danger">{error}</Alert>}
+        
+        <div className="d-grid gap-2">
+          <Button variant="primary" type="submit">
+            S'enregistrer
+          </Button>
         </div>
-        
-        {error && <div className="error-message">{error}</div>}
-        
-        <button type="submit">S'enregistrer</button>
-      </form>
+      </Form>
     </div>
   )
 }

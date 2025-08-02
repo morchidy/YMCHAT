@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { Form, Button, Alert } from 'react-bootstrap'
 
 function LoginForm({ prefillEmail = '' }) {
   const [email, setEmail] = useState(prefillEmail)
@@ -41,36 +42,42 @@ function LoginForm({ prefillEmail = '' }) {
   }
 
   return (
-    <div className="form-container">
-      <h2>Se Connecter</h2>
+    <div>
+      <h2 className="text-center mb-4">Se Connecter</h2>
       
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="login-email">Email</label>
-          <input 
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3">
+          <Form.Label>Email</Form.Label>
+          <Form.Control 
             type="email" 
             id="login-email" 
             value={email} 
             onChange={handleEmailChange}
+            placeholder="Entrez votre email"
             required
           />
-        </div>
+        </Form.Group>
         
-        <div className="form-group">
-          <label htmlFor="login-password">Mot de Passe</label>
-          <input 
+        <Form.Group className="mb-3">
+          <Form.Label>Mot de Passe</Form.Label>
+          <Form.Control 
             type="password" 
             id="login-password" 
             value={password} 
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="Entrez votre mot de passe"
             required
           />
+        </Form.Group>
+        
+        {error && <Alert variant="danger">{error}</Alert>}
+        
+        <div className="d-grid gap-2">
+          <Button variant="primary" type="submit">
+            Se Connecter
+          </Button>
         </div>
-        
-        {error && <div className="error-message">{error}</div>}
-        
-        <button type="submit">Se Connecter</button>
-      </form>
+      </Form>
     </div>
   )
 }

@@ -1,20 +1,31 @@
 import { useAuth } from '../context/AuthContext';
 import GroupList from '../components/GroupList';
+import { Container, Navbar, Button } from 'react-bootstrap';
 
 function Accueil() {
   const { user, logout } = useAuth();
 
   return (
-    <div className="accueil-container">
-      <header className="user-header">
-        <span>{user?.email}</span>
-        <button onClick={logout} className="logout-btn">Se déconnecter</button>
-      </header>
+    <div>
+      <Navbar bg="dark" variant="dark" className="mb-4">
+        <Container>
+          <Navbar.Brand>Réseau Social</Navbar.Brand>
+          <Navbar.Toggle />
+          <Navbar.Collapse className="justify-content-end">
+            <Navbar.Text className="me-3">
+              Connecté en tant que: {user?.email}
+            </Navbar.Text>
+            <Button variant="outline-light" onClick={logout} size="sm">
+              Se déconnecter
+            </Button>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
       
-      <main>
-        <h2>Mes groupes</h2>
+      <Container>
+        <h2 className="mb-4">Mes groupes</h2>
         <GroupList />
-      </main>
+      </Container>
     </div>
   );
 }

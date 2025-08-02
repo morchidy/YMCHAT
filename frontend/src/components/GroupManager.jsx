@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import groupService from '../services/groupService';
 import userService from '../services/userService';
 import GroupChat from './GroupChat';
+import { Button, Spinner, Alert, Form, ListGroup, Card, Tabs, Tab } from 'react-bootstrap';
 
 function GroupManager({ group, onBack }) {
   const { token, user } = useAuth();
@@ -86,95 +87,95 @@ function GroupManager({ group, onBack }) {
     }
   };
 
-  if (loading) {
-    return <div className="loading">Chargement des membres...</div>;
-  }
-
   // Filtrer les utilisateurs qui ne sont pas déjà membres
   const availableUsers = allUsers.filter(
     u => !members.some(m => m.id === u.id)
   );
 
-   // Fonction pour changer d'onglet
-  const changeTab = (tab) => {
-    setActiveTab(tab);
-  };
-
   if (loading) {
-    return <div className="loading">Chargement...</div>;
+    return (
+      <div className="text-center py-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Chargement...</span>
+        </Spinner>
+      </div>
+    );
   }
 
   return (
-    <div className="group-manager">
-      <div className="manager-header">
-        <button onClick={onBack} className="back-btn">Retour</button>
+    <div>
+      <div className="mb-4 d-flex align-items-center">
+        <Button variant="secondary" onClick={onBack} className="me-3">
+          <i className="bi bi-arrow-left"></i> Retour
+        </Button>
         <h2>Groupe "{group.name}"</h2>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <Alert variant="danger">{error}</Alert>}
 
-      <div className="tabs">
-        <button 
-          className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`}
-          onClick={() => changeTab('members')}
-        >
-          Membres
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
-          onClick={() => changeTab('chat')}
-        >
-          Messages
-        </button>
-      </div>
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(k) => setActiveTab(k)}
+        className="mb-4"
+      >
+        <Tab eventKey="members" title="Membres">
+          <Card className="mb-4">
+            <Card.Header as="h5">Ajouter un membre</Card.Header>
+            <Card.Body>
+              <Form onSubmit={handleAddMember}>
+                <Form.Group className="d-flex">
+                  <Form.Select
+                    value={selectedUserId}
+                    onChange={(e) => setSelectedUserId(e.target.value)}
+                    className="me-2"
+                  >
+                    <option value="">Sélectionnez un utilisateur</option>
+                    {availableUsers.map(user => (
+                      <option key={user.id} value={user.id}>
+                        {user.email}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  <Button type="submit" variant="primary">
+                    Ajouter
+                  </Button>
+                </Form.Group>
+              </Form>
+            </Card.Body>
+          </Card>
 
-      {activeTab === 'members' ? (
-        <>
-          <div className="add-member-section">
-            <h3>Ajouter un membre</h3>
-            <form onSubmit={handleAddMember} className="add-member-form">
-              {/* Votre code existant pour l'ajout de membres */}
-              <select 
-                value={selectedUserId} 
-                onChange={(e) => setSelectedUserId(e.target.value)}
-                className="user-select"
-              >
-                <option value="">Sélectionnez un utilisateur</option>
-                {availableUsers.map(user => (
-                  <option key={user.id} value={user.id}>
-                    {user.email}
-                  </option>
-                ))}
-              </select>
-              <button type="submit" className="add-btn">Ajouter</button>
-            </form>
-          </div>
-
-          <div className="members-section">
-            <h3>Liste des membres</h3>
-            {members.length > 0 ? (
-              <ul className="members-list">
-                {members.map(member => (
-                  <li key={member.id} className="member-item">
-                    <span>{member.email}</span>
-                    <button 
-                      onClick={() => handleRemoveMember(member.id)} 
-                      className="remove-btn"
-                      disabled={member.id === user.id}
+          <Card>
+            <Card.Header as="h5">Liste des membres</Card.Header>
+            <Card.Body>
+              {members.length > 0 ? (
+                <ListGroup>
+                  {members.map(member => (
+                    <ListGroup.Item 
+                      key={member.id} 
+                      className="d-flex justify-content-between align-items-center"
                     >
-                      Supprimer
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>Aucun membre dans ce groupe.</p>
-            )}
-          </div>
-        </>
-      ) : (
-        <GroupChat group={group} />
-      )}
+                      <span>{member.email}</span>
+                      <Button 
+                        variant="danger" 
+                        size="sm"
+                        onClick={() => handleRemoveMember(member.id)}
+                        disabled={member.id === user.id}
+                      >
+                        Supprimer
+                      </Button>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              ) : (
+                <p className="text-muted">Aucun membre dans ce groupe.</p>
+              )}
+            </Card.Body>
+          </Card>
+        </Tab>
+        <Tab eventKey="chat" title="Messages">
+          <GroupChat group={group} />
+        </Tab>
+      </Tabs>
     </div>
   );
 }

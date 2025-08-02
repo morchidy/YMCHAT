@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import LoginForm from '../components/LoginForm'
 import RegisterForm from '../components/RegisterForm'
+import { Container, Row, Col, Card } from 'react-bootstrap'
 
 function Login() {
   const [registeredEmail, setRegisteredEmail] = useState('')
@@ -10,19 +11,31 @@ function Login() {
   }
 
   return (
-    <div className="login-view">
-      <h1>Réseau Social</h1>
+    <Container className="py-5">
+      <Row className="justify-content-center mb-4">
+        <Col md={8} className="text-center">
+          <h1 className="display-4 mb-4">Réseau Social</h1>
+        </Col>
+      </Row>
       
-      <div className="auth-container">
-        <div className="auth-form">
-          <LoginForm prefillEmail={registeredEmail} />
-        </div>
+      <Row className="justify-content-center">
+        <Col md={5} className="mb-4 mb-md-0">
+          <Card className="shadow-sm">
+            <Card.Body>
+              <LoginForm prefillEmail={registeredEmail} />
+            </Card.Body>
+          </Card>
+        </Col>
         
-        <div className="auth-form">
-          <RegisterForm onRegisterSuccess={handleRegisterSuccess} />
-        </div>
-      </div>
-    </div>
+        <Col md={5}>
+          <Card className="shadow-sm">
+            <Card.Body>
+              <RegisterForm onRegisterSuccess={handleRegisterSuccess} />
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   )
 }
 

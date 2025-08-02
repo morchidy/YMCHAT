@@ -3,7 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import groupService from '../services/groupService';
 import CreateGroup from './CreateGroup';
 import GroupManager from './GroupManager';
-import GroupChat from './GroupChat'; // Importez le composant GroupChat
+import GroupChat from './GroupChat';
+import { Card, ListGroup, Button, Spinner, Alert } from 'react-bootstrap';
 
 function GroupList() {
   const { token } = useAuth();
@@ -13,7 +14,7 @@ function GroupList() {
   const [error, setError] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedMemberGroup, setSelectedMemberGroup] = useState(null);
-  const [viewMode, setViewMode] = useState('list'); // 'list', 'manage', 'view'
+  const [viewMode, setViewMode] = useState('list');
 
   const fetchGroups = async () => {
     setLoading(true);
@@ -22,10 +23,8 @@ function GroupList() {
     try {
       // Récupérer les groupes dont l'utilisateur est membre
       const memberResponse = await groupService.getGroupsMember(token);
-      console.log('Member groups response:', memberResponse);
       
       if (memberResponse.status) {
-        // Si l'API renvoie des données, les utiliser
         setMemberGroups(memberResponse.data || []);
       } else {
         setError('Erreur lors de la récupération des groupes membres');
@@ -33,7 +32,6 @@ function GroupList() {
       
       // Récupérer les groupes dont l'utilisateur est propriétaire
       const ownedResponse = await groupService.getMyGroups(token);
-      console.log('Owned groups response:', ownedResponse);
       
       if (ownedResponse.status) {
         setOwnedGroups(ownedResponse.data || []);
@@ -58,14 +56,12 @@ function GroupList() {
   const handleGroupClick = (group) => {
     setSelectedGroup(group);
     setViewMode('manage');
-    console.log('Groupe sélectionné pour administration:', group);
   };
 
   // Gérer la sélection d'un groupe dont l'utilisateur est membre
   const handleMemberGroupClick = (group) => {
     setSelectedMemberGroup(group);
     setViewMode('view');
-    console.log('Groupe membre sélectionné pour visualisation:', group);
   };
 
   // Retour à la liste des groupes
@@ -78,7 +74,13 @@ function GroupList() {
   };
 
   if (loading) {
-    return <div className="loading">Chargement des groupes...</div>;
+    return (
+      <div className="text-center py-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Chargement des groupes...</span>
+        </Spinner>
+      </div>
+    );
   }
 
   // Si un groupe est sélectionné pour être administré
@@ -89,10 +91,12 @@ function GroupList() {
   // Si un groupe est sélectionné pour voir ses messages
   if (viewMode === 'view' && selectedMemberGroup) {
     return (
-      <div className="group-view">
-        <div className="manager-header">
-          <button onClick={handleBackToList} className="back-btn">Retour</button>
-          <h2>Messages du groupe "{selectedMemberGroup.name}"</h2>
+      <div>
+        <div className="mb-4">
+          <Button variant="secondary" onClick={handleBackToList}>
+            <i className="bi bi-arrow-left"></i> Retour
+          </Button>
+          <h3 className="mt-3">Messages du groupe "{selectedMemberGroup.name}"</h3>
         </div>
         <GroupChat group={selectedMemberGroup} />
       </div>
@@ -100,48 +104,50 @@ function GroupList() {
   }
 
   return (
-    <div className="group-lists">
-      {error && <div className="error-message">{error}</div>}
+    <div>
+      {error && <Alert variant="danger">{error}</Alert>}
       
-      <div className="group-section">
-        <h3>Ceux dont je suis membre</h3>
-        {memberGroups && memberGroups.length > 0 ? (
-          <ul className="group-list">
-            {memberGroups.map((group, index) => (
-              <li 
-                key={group.id || `member-${index}`} 
-                className="group-item"
-                onClick={() => handleMemberGroupClick(group)}
-                style={{ cursor: 'pointer' }}
-              >
-                {group.name || <p style={{ color: '#000' }}>Groupe sans nom</p>}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p style={{ color: '#ccc' }}>Vous n'êtes membre d'aucun groupe.</p>
-        )}
-      </div>
+      <Card className="mb-4">
+        <Card.Header as="h5">Ceux dont je suis membre</Card.Header>
+        <Card.Body>
+          {memberGroups && memberGroups.length > 0 ? (
+            <ListGroup>
+              {memberGroups.map((group, index) => (
+                <ListGroup.Item 
+                  key={group.id || `member-${index}`} 
+                  action
+                  onClick={() => handleMemberGroupClick(group)}
+                >
+                  {group.name || "Groupe sans nom"}
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          ) : (
+            <p className="text-muted">Vous n'êtes membre d'aucun groupe.</p>
+          )}
+        </Card.Body>
+      </Card>
       
-      <div className="group-section">
-        <h3>Ceux que j'administre</h3>
-        {ownedGroups && ownedGroups.length > 0 ? (
-          <ul className="group-list">
-            {ownedGroups.map((group, index) => (
-              <li 
-                key={group.id || `owner-${index}`} 
-                className="group-item"
-                onClick={() => handleGroupClick(group)}
-                style={{ cursor: 'pointer' }}
-              >
-                {group.name || "Groupe sans nom"}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p style={{ color: '#ccc' }}>Vous n'administrez aucun groupe.</p>
-        )}
-      </div>
+      <Card className="mb-4">
+        <Card.Header as="h5">Ceux que j'administre</Card.Header>
+        <Card.Body>
+          {ownedGroups && ownedGroups.length > 0 ? (
+            <ListGroup>
+              {ownedGroups.map((group, index) => (
+                <ListGroup.Item 
+                  key={group.id || `owner-${index}`} 
+                  action
+                  onClick={() => handleGroupClick(group)}
+                >
+                  {group.name || "Groupe sans nom"}
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          ) : (
+            <p className="text-muted">Vous n'administrez aucun groupe.</p>
+          )}
+        </Card.Body>
+      </Card>
       
       <CreateGroup onGroupCreated={fetchGroups} />
     </div>
