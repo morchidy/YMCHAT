@@ -1,0 +1,37 @@
+name: Deploy Backend to Scalingo
+
+on:
+  push:
+    branches: [ main ]
+    paths: 
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    - name: Run tests
+      working-directory: ./backend
+      run: npm test
+
+    - name: Deploy to Scalingo
+      uses: scalingo/scalingo-github-action@v1
+      with:
+        scalingo_api_token: ${{ secrets.SCALINGO_API_TOKEN }}
+        scalingo_app_name: ${{ secrets.SCALINGO_APP_NAME }}
+        scalingo_region: osc-fr1
+        source_dir: backend

@@ -21,6 +21,18 @@ app.use(cookieParser())
 app.use(cors())
 app.use(helmet())
 
+// Configuration CORS pour la production
+const corsOptions = {
+  origin: [
+    'http://localhost:5173', // Développement
+    'https://VOTRE_USERNAME.github.io' // Production GitHub Pages
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions))
+
 // Frontend code access in static mode
 app.use('/frontend', express.static('./src/frontend'))
 
