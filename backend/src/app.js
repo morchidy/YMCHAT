@@ -25,7 +25,8 @@ app.use(helmet())
 const corsOptions = {
   origin: [
     'http://localhost:5173', // Développement
-    'https://morchidy.github.io' // Production GitHub Pages
+    'https://morchidy.github.io', // Production GitHub Pages
+    'https://morchidy.github.io/YMCHAT'
   ],
   credentials: true,
   optionsSuccessStatus: 200
