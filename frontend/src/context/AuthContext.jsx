@@ -1,5 +1,7 @@
 import { createContext, useState, useContext, useEffect } from 'react'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const AuthContext = createContext()
 
 export function AuthProvider({ children }) {
@@ -34,7 +36,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:3000/login', {
+      const response = await fetch('${API_URL}/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -57,7 +59,7 @@ export function AuthProvider({ children }) {
 
   const register = async (name, email, password) => {
     try {
-      const response = await fetch('http://localhost:3000/register', {
+      const response = await fetch('${API_URL}/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
