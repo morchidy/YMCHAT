@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import groupService from '../services/groupService';
 import userService from '../services/userService';
+import groupService from '../services/groupService';
+import { Button, Alert, Form, ListGroup, Card, Tabs, Tab, Spinner } from 'react-bootstrap';
 import GroupChat from './GroupChat';
-import { Button, Spinner, Alert, Form, ListGroup, Card, Tabs, Tab } from 'react-bootstrap';
 
 function GroupManager({ group, onBack }) {
   const { token, user } = useAuth();
@@ -92,7 +92,7 @@ function GroupManager({ group, onBack }) {
     u => !members.some(m => m.id === u.id)
   );
 
-  if (loading) {
+  if (loading && activeTab === 'members') {
     return (
       <div className="text-center py-5">
         <Spinner animation="border" role="status">
@@ -172,8 +172,16 @@ function GroupManager({ group, onBack }) {
             </Card.Body>
           </Card>
         </Tab>
+        
         <Tab eventKey="chat" title="Messages">
-          <GroupChat group={group} />
+          {/* Utiliser une div avec hauteur pour contenir le GroupChat */}
+          <div className="admin-chat-container">
+            <GroupChat 
+              group={group} 
+              key={`admin-chat-${group.id}`}
+              isAdminView={true}  // Indiquer que c'est une vue d'admin
+            />
+          </div>
         </Tab>
       </Tabs>
     </div>

@@ -42,8 +42,8 @@ function LoginForm({ prefillEmail = '' }) {
   }
 
   return (
-    <div>
-      <h2 className="text-center mb-4">Se Connecter</h2>
+    <div className="auth-form login-form">
+      <h2>Se Connecter</h2>
       
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
@@ -58,7 +58,7 @@ function LoginForm({ prefillEmail = '' }) {
           />
         </Form.Group>
         
-        <Form.Group className="mb-3">
+        <Form.Group className="mb-4">
           <Form.Label>Mot de Passe</Form.Label>
           <Form.Control 
             type="password" 
@@ -70,10 +70,10 @@ function LoginForm({ prefillEmail = '' }) {
           />
         </Form.Group>
         
-        {error && <Alert variant="danger">{error}</Alert>}
+        {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
         
-        <div className="d-grid gap-2">
-          <Button variant="primary" type="submit">
+        <div className="d-grid">
+          <Button variant="primary" type="submit" size="lg">
             Se Connecter
           </Button>
         </div>

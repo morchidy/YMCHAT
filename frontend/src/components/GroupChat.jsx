@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import messageService from '../services/messageService';
 
-function GroupChat({ group }) {
+function GroupChat({ group, isAdminView = false }) {  // Ajout du paramètre isAdminView
   const { token, user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -11,7 +11,7 @@ function GroupChat({ group }) {
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const intervalRef = useRef(null);
-  const lastMessageIdRef = useRef(null);
+  const lastFetchedTimestampRef = useRef(null);
   const initialScrollDoneRef = useRef(false);
 
   // Charger les messages du groupe
@@ -21,32 +21,28 @@ function GroupChat({ group }) {
     try {
       const response = await messageService.getGroupMessages(token, group.id);
       if (response.status) {
+        // Toujours trier les messages par date (du plus ancien au plus récent)
         const sortedMessages = [...(response.data || [])].sort((a, b) => {
           return new Date(a.createdAt) - new Date(b.createdAt);
         });
         
-        const hasNewMessages = sortedMessages.length > 0 && 
-                             (!lastMessageIdRef.current || 
-                              sortedMessages[sortedMessages.length - 1].id > lastMessageIdRef.current);
+        setMessages(sortedMessages);
         
-        if (hasNewMessages || messages.length === 0) {
-          setMessages(sortedMessages);
-          
-          if (sortedMessages.length > 0) {
-            lastMessageIdRef.current = sortedMessages[sortedMessages.length - 1].id;
-          }
+        if (sortedMessages.length > 0) {
+          lastFetchedTimestampRef.current = new Date().getTime();
         }
       } else {
         if (!silent) setError('Erreur lors de la récupération des messages');
       }
     } catch (err) {
+      console.error("Erreur fetchMessages:", err);
       if (!silent) setError('Erreur de connexion au serveur');
     } finally {
       if (!silent) setLoading(false);
     }
   };
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (force = false) => {
     requestAnimationFrame(() => {
       if (messagesContainerRef.current) {
         messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -54,41 +50,71 @@ function GroupChat({ group }) {
     });
   };
 
+  // Effet pour charger les messages initiaux et configurer le polling
   useEffect(() => {
-    if (token && group) {
+    if (token && group && group.id) {
+      console.log(`Initialisation du chat pour le groupe ${group.id} (admin: ${isAdminView})`);
+      
+      // Nettoyer l'état précédent
+      setMessages([]);
+      setNewMessage('');
+      setLoading(true);
+      setError('');
+      initialScrollDoneRef.current = false;
+      lastFetchedTimestampRef.current = null;
+      
+      // Charger les messages
       fetchMessages();
+      
+      // Configurer le polling pour les mises à jour
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       
       intervalRef.current = setInterval(() => {
         fetchMessages(true);
-      }, 5000);
+      }, 3000);
       
       return () => {
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
+          intervalRef.current = null;
         }
-        initialScrollDoneRef.current = false;
       };
     }
-  }, [token, group]);
+  }, [token, group?.id, isAdminView]);
 
+  // Effet pour gérer le défilement initial et lors des mises à jour
   useEffect(() => {
     if (messages.length > 0 && !loading) {
-      if (!initialScrollDoneRef.current) {
+      // Toujours défiler vers le bas lors du premier chargement et spécifiquement pour les groupes administrés
+      if (!initialScrollDoneRef.current || isAdminView) {
         initialScrollDoneRef.current = true;
-        if (messagesContainerRef.current) {
-          messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-        }
+        scrollToBottom();
       } else {
+        // Pour les mises à jour ultérieures, vérifier si l'utilisateur est déjà en bas
         const isScrolledToBottom = 
-          messagesContainerRef.current.scrollHeight - messagesContainerRef.current.clientHeight <= 
-          messagesContainerRef.current.scrollTop + 100;
+          messagesContainerRef.current && 
+          (messagesContainerRef.current.scrollHeight - messagesContainerRef.current.clientHeight <= 
+          messagesContainerRef.current.scrollTop + 100);
         
         if (isScrolledToBottom) {
           scrollToBottom();
         }
       }
     }
-  }, [messages, loading]);
+  }, [messages, loading, isAdminView]);
+
+  // Ajout d'un effet spécifique pour assurer le défilement dans la vue admin après le rendu
+  useEffect(() => {
+    if (isAdminView && messages.length > 0 && !loading) {
+      // Utiliser un délai court pour s'assurer que le DOM a été mis à jour
+      const timer = setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isAdminView, messages.length, loading]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -106,13 +132,15 @@ function GroupChat({ group }) {
         };
         
         setMessages(prevMessages => [...prevMessages, newMsg]);
-        lastMessageIdRef.current = newMsg.id;
         setNewMessage('');
-        scrollToBottom();
+        scrollToBottom(true);
+        
+        setTimeout(() => fetchMessages(true), 300);
       } else {
         setError(response.message || 'Erreur lors de l\'envoi du message');
       }
     } catch (err) {
+      console.error("Erreur d'envoi:", err);
       setError('Erreur de connexion au serveur');
     }
   };
@@ -149,7 +177,6 @@ function GroupChat({ group }) {
                   {!isMyMessage && (
                     <div className="message-sender">
                       {message.user?.name || message.user?.email || `Utilisateur #${message.userId}`}
-                      {message.user?.email !== message.user?.name && message.user?.name && ` (${message.user.email})`}
                     </div>
                   )}
                   <div className="message-bubble">
@@ -181,7 +208,7 @@ function GroupChat({ group }) {
         />
         <div className="message-counter">{newMessage.length}/700</div>
         <button type="submit" className="send-button">
-          <i className="bi bi-cursor-fill"></i>
+          <i className="bi bi-arrow-right-short" style={{fontSize: "1.5rem"}}></i>
         </button>
       </form>
     </div>
