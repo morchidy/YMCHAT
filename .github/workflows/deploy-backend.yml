@@ -2,9 +2,9 @@ name: Deploy to Scalingo
 
 on:
   push:
-    branches:
-      - main  # ou la branche depuis laquelle tu veux déployer
-
+    tags:
+      - 'deploy-backend-*'  # Se déclenche uniquement pour les tags qui commencent par "deploy-backend-"
+      
 jobs:
   scalingo-deploy:
     runs-on: ubuntu-latest

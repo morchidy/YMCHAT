@@ -1,10 +1,10 @@
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const userService = {
   // Récupérer tous les utilisateurs
   async getAllUsers(token) {
     try {
-      const response = await fetch(`http://localhost:3000/api/users`, {
+      const response = await fetch(`${API_URL}/api/users`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
