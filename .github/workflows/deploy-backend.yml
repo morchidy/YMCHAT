@@ -1,37 +1,43 @@
-name: Deploy Backend to Scalingo
+name: Deploy Backend
 
 on:
   push:
     branches: [ main ]
-    paths: 
-      - 'backend/**'
-  workflow_dispatch:
+    paths: ['backend/**']
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-
-    - name: Install dependencies
+    
+    - name: Test backend
       working-directory: ./backend
-      run: npm ci
-
-    - name: Run tests
-      working-directory: ./backend
-      run: npm test
-
-    - name: Deploy to Scalingo
-      uses: scalingo/scalingo-github-action@v1
-      with:
-        scalingo_api_token: ${{ secrets.SCALINGO_API_TOKEN }}
-        scalingo_app_name: ${{ secrets.SCALINGO_APP_NAME }}
-        scalingo_region: osc-fr1
-        source_dir: backend
+      run: |
+        npm ci
+        npm test
+    
+    - name: Setup SSH and deploy
+      env:
+        SCALINGO_APP_NAME: ${{ secrets.SCALINGO_APP_NAME }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SCALINGO_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan ssh.osc-fr1.scalingo.com >> ~/.ssh/known_hosts
+        
+        cd backend
+        git init
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add .
+        git commit -m "Auto-deploy from GitHub"
+        git remote add scalingo git@ssh.osc-fr1.scalingo.com:${SCALINGO_APP_NAME}.git
+        git push scalingo HEAD:master --force
