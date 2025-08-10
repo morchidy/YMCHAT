@@ -4,7 +4,7 @@ const request = require('supertest')
 test('Test if user can log in and list users', async () => {
   let response = await request(app)
     .post('/login')
-    .send({ email: 'Sebastien.Viardot@grenoble-inp.fr', password: '123456' })
+    .send({ email: 'Youssef.Morchid@grenoble-inp.org', password: '123456' })
   expect(response.statusCode).toBe(200)
   expect(response.body).toHaveProperty('token')
   response = await request(app)

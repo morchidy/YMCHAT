@@ -13,6 +13,7 @@ function Accueil() {
   const [error, setError] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [viewMode, setViewMode] = useState('chat'); // 'chat' ou 'manage'
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fetchGroups = async () => {
     setLoading(true);
@@ -52,13 +53,31 @@ function Accueil() {
   const handleGroupClick = (group, isOwned = false) => {
     setSelectedGroup(group);
     setViewMode(isOwned ? 'manage' : 'chat');
+    setSidebarOpen(false); // Fermer la sidebar sur mobile après sélection
+  };
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
   };
 
   return (
     <div className="chat-layout">
       {/* Header */}
       <div className="chat-header">
-        <div className="chat-brand">YMCHAT</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button 
+            className="mobile-sidebar-toggle"
+            onClick={toggleSidebar}
+            aria-label="Toggle sidebar"
+          >
+            <i className="bi bi-list"></i>
+          </button>
+          <div className="chat-brand">YMCHAT</div>
+        </div>
         <div className="user-info">
           <span className="user-name">{user?.name || user?.email}</span>
           <button onClick={logout} className="logout-btn">Log out</button>
@@ -66,8 +85,14 @@ function Accueil() {
       </div>
 
       <div className="chat-container">
+        {/* Overlay pour fermer la sidebar sur mobile */}
+        <div 
+          className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
+          onClick={closeSidebar}
+        ></div>
+
         {/* Sidebar pour les groupes */}
-        <div className="chat-sidebar">
+        <div className={`chat-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
           <div className="search-container">
             <input type="text" placeholder="Search" className="search-input" />
             <button className="search-btn">

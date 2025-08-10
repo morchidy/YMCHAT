@@ -15,7 +15,7 @@ const messages = require('../models/messages.js');
   const passhash = await bcrypt.hash('123456', 2)
   console.log(passhash)
   await userModel.create({
-    name: 'Sebastien Viardot', email: 'Sebastien.Viardot@grenoble-inp.fr', passhash
+    name: 'Youssef Morchid', email: 'Youssef.Morchid@grenoble-inp.org', passhash
   })
 
   // Ajouter ici le code permettant d'initialiser par défaut la base de donnée
