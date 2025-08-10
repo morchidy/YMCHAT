@@ -7,6 +7,7 @@ author:
 # Application de Chat par Groupes
 
 Application web full-stack permettant la gestion de groupes de discussion en temps réel avec système d'authentification et de permissions.
+L'application est accessible sur  https://morchidy.github.io/YMCHAT/
 
 ## Table des matières
 
