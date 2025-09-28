@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
       const data = await response.json()
       
       if (response.ok) {
-        return { success: true, email }
+        return { success: true, email, message: data.message }
       } else {
         return { success: false, message: data.message || 'Erreur lors de l\'enregistrement' }
       }

@@ -26,15 +26,25 @@ function Login() {
     setRegSuccess('')
   }
 
+   // Validation du mot de passe (même règle que le backend)
+  const validatePassword = (password) => {
+    return /^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*])[\w!@#$%^&*]{8,}$/.test(password)
+  }
+
   const handleLogin = async (e) => {
     e.preventDefault()
     setLoginError('')
     try {
-      const ok = await login(lEmail.trim(), lPassword)
-      if (!ok) setLoginError('Identifiants invalides.')
-    } catch {
-      setLoginError('Erreur de connexion.')
+    const result = await login(lEmail.trim(), lPassword)
+    // Si login retourne false ou un objet d'erreur
+    if (!result || result === false) {
+      setLoginError('Email ou mot de passe incorrect.')
+    } else if (result.success === false) {
+      setLoginError(result.message || 'Email ou mot de passe incorrect.')
     }
+  } catch (error) {
+    setLoginError('Erreur de connexion au serveur.')
+  }
   }
 
   const handleRegister = async (e) => {
@@ -46,8 +56,8 @@ function Login() {
       setRegError('Les mots de passe ne correspondent pas.')
       return
     }
-    if (rPassword.length < 6) {
-      setRegError('Mot de passe trop court (minimum 6 caractères).')
+    if (!validatePassword(rPassword)) {
+      setRegError('Le mot de passe doit contenir au moins 8 caractères, incluant une majuscule, une minuscule, un chiffre et un caractère spécial (!@#$%^&*)')
       return
     }
     
@@ -193,7 +203,7 @@ function Login() {
                     type="password"
                     value={rPassword}
                     onChange={(e) => setRPassword(e.target.value)}
-                    placeholder="Minimum 6 caractères"
+                    placeholder=" Entrez un mot de passe fort!"
                     required
                     autoComplete="new-password"
                   />

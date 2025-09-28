@@ -16,7 +16,7 @@ function RegisterForm({ onRegisterSuccess }) {
   }
 
   const validatePassword = (password) => {
-    return password.length >= 6
+    return /^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*])[\w!@#$%^&*]{8,}$/.test(password)
   }
 
   const validateForm = () => {
@@ -29,8 +29,8 @@ function RegisterForm({ onRegisterSuccess }) {
       return false
     }
     if (!validatePassword(password)) {
-      setError('Le mot de passe doit contenir au moins 6 caractères')
-      return false
+    setError('Le mot de passe doit contenir au moins 8 caractères, incluant une majuscule, une minuscule, un chiffre et un caractère spécial (!@#$%^&*)')
+    return false
     }
     if (password !== confirmPassword) {
       setError('Les mots de passe ne correspondent pas')
@@ -99,7 +99,7 @@ function RegisterForm({ onRegisterSuccess }) {
             id="register-password" 
             value={password} 
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mot de passe (au moins 6 caractères)"
+            placeholder="Mot de passe"
             required
           />
         </Form.Group>
